@@ -12,36 +12,36 @@ setwd('/Users/admin/Documents/Analytics Strategy/AY24 CBA')
 data<-fread('INF002v4.csv',stringsAsFactors = T)
 summary(data)
 
-# Problems
-- LOS is an important factor for hospitals to allocate resources and for patients to estimate their cost and insurance claims
+### Problems
+- Length of stay (LOS) is an important factor for hospitals to allocate resources and for patients to estimate their cost and insurance claims
 - The estimation is done using the mean LOS in each CCSR diagnosis.
 
 
-# Objectives:
+### Objectives:
 - estimate the LOS more accurately upon admission than using the mean LOS 
 - help hospital allocate the resources better 
 - help patients estimate the cost based on estimated LOS
 
 -> predictive model
 
-# Tools
+### Tools
 - descriptive analysis 
 - predictive analysis by linear regression, CART and Random Forest
 
 
-# Step After
+### Step After
 - Check and clean data
 - Remove unused data 
 - Calculate descriptive
 - Run each models 
 
-# Variables:
+### Variables:
 - Y1: LOS 
 - Y2: Est cost
 
 - X:Age, Gender, Type of admissions, Patient disposition, APR.DRG.Description, Severity of illness (descrip), risk of mortality, medical surgical description 
 
-# Initial reviews
+### Initial reviews
 - What is the avg los of total record and the avg charges and cosr of patients
 - How much is the dif between charge and cost(est charge)
 - What is the mean los of these x variables (groups)
@@ -54,7 +54,7 @@ data<- data[Gender != "U"]
 
 
 
-# avg los by CCSR Diagnosis :9.5 days , min is 1, median is 6 , 
+### avg los by CCSR Diagnosis :9.5 days , min is 1, median is 6 , 
 
 summary(data$Length.of.Stay)
 outliers <- data$Length.of.Stay[data$Length.of.Stay < 1 | data$Length.of.Stay > 23]
@@ -67,7 +67,7 @@ IQR <- IQR(data$Length.of.Stay)
 data_no_outlier <- data[data$Length.of.Stay <23]
 summary(data_no_outlier$Length.of.Stay)
 
-# diff between 
+### diff between 
 data$Total.Charges  <- as.numeric(gsub(",", "", data$Total.Charges))
 data$Total.Costs  <- as.numeric(gsub(",", "", data$Total.Costs))
 
@@ -96,9 +96,9 @@ ggplot(freq_table, aes(x = reorder(Payment.Typology.1, -n), y = n)) +
 
 
 
-# descriptive stats all datasets
+### descriptive stats all datasets
 
-# mean, variance, median los by hospital service area : differences also 
+### mean, variance, median los by hospital service area : differences also 
 des_area <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
   median = median(Length.of.Stay, na.rm = TRUE),
@@ -117,7 +117,7 @@ des_area_no <- data_no_outlier[, .(
   n = .N
 ), by = Hospital.Service.Area]
 
-# mean, variance, median los by age group : pp from 30 to 49 and 50 to 69 has highest avg los 
+### mean, variance, median los by age group : pp from 30 to 49 and 50 to 69 has highest avg los 
 des_age <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
   median = median(Length.of.Stay, na.rm = TRUE),
@@ -139,7 +139,7 @@ des_age_no <- data_no_outlier[, .(
 ), by = Age.Group]
 
 
-# mean, variance, median  los by gender: men and women have little difference
+### mean, variance, median  los by gender: men and women have little difference
 
 des_gen <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
@@ -159,7 +159,7 @@ des_gen_no <- data_no_outlier[, .(
   n = .N
 ), by = Gender]
 
-# mean, variance, median  by race: Black/african has significanr higher avg los 
+### mean, variance, median  by race: Black/african has significanr higher avg los 
 des_race <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
   median = median(Length.of.Stay, na.rm = TRUE),
@@ -180,7 +180,7 @@ des_race_no <- data_no_outlier[, .(
 
 
 
-# mean, variance, median  by ethnicity ; Unknown gr has higher -> can skip this variable
+### mean, variance, median  by ethnicity ; Unknown gr has higher -> can skip this variable
 
 des_eth <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
@@ -200,7 +200,7 @@ des_eth_no <- data_no_outlier[, .(
   n = .N
 ), by = Ethnicity]
 
-# mean, variance, median  los by admission : also big # among groups
+### mean, variance, median  los by admission : also big # among groups
 
 des_admission <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
@@ -249,7 +249,7 @@ ggplot(mortality_df, aes(x = AdmissionType, y = Count, fill = Mortality)) +
 
 
 
-# mean, variance, median  los of disposition : Differences among types of disposition
+### mean, variance, median  los of disposition : Differences among types of disposition
 
 des_dispo <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
@@ -269,7 +269,7 @@ des_dispo_no <- data_no_outlier[, .(
   n = .N
 ), by = Patient.Disposition]
 
-# mean, variance, median vg los by drg : Differences among types of disposition
+### mean, variance, median vg los by drg : Differences among types of disposition
 des_drg <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
   median = median(Length.of.Stay, na.rm = TRUE),
@@ -290,7 +290,7 @@ des_drg_no <- data_no_outlier[, .(
 
 
 
-#mean, variance, median los by severity: Differences among types of severity
+### mean, variance, median los by severity: Differences among types of severity
 
 des_severity <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
@@ -310,7 +310,7 @@ des_severity_no <- data_no_outlier[, .(
   n = .N
 ), by = APR.Severity.of.Illness.Description]
 
-#mean, variance, median  by risk of mortality : Differences among types of mortality
+### mean, variance, median  by risk of mortality : Differences among types of mortality
 
 des_mortality <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
@@ -331,7 +331,7 @@ des_mortality_no <- data_no_outlier[, .(
 ), by = APR.Risk.of.Mortality]
 
 
-#mean, variance, median los by medical surgical: also different
+### mean, variance, median los by medical surgical: also different
 des_surgical <- data[, .(
   mean = mean(Length.of.Stay, na.rm = TRUE),
   median = median(Length.of.Stay, na.rm = TRUE),
@@ -352,7 +352,7 @@ des_surgical_no <- data_no_outlier[, .(
 ), by = APR.Medical.Surgical.Description]
 
 
-# mean, variance, median  by emergency: When removing outliers, 2 types have no differences
+### mean, variance, median  by emergency: When removing outliers, 2 types have no differences
 
 
 des_emergency <- data[, .(
@@ -375,7 +375,7 @@ des_emergency_no <- data_no_outlier[, .(
 
 
 
-# clean data for modeling:
+### clean data for modeling:
 
 #combine 6 factors have 1 record into 1 factor Others
 #PANCREAS TRANSPLANT, 
@@ -386,16 +386,16 @@ des_emergency_no <- data_no_outlier[, .(
 #IMPLANTABLE HEART ASSIST SYSTEMS
 
 
-# final X variables: hospital area, age, race, admissions, disposition, drg, severity, mortality, surgical
+### final X variables: hospital area, age, race, admissions, disposition, drg, severity, mortality, surgical
 data_model <- data[,c('Hospital.Service.Area', 'Age.Group','Race','Length.of.Stay','Patient.Disposition','Type.of.Admission',
                       'APR.DRG.Description','APR.Risk.of.Mortality','APR.Severity.of.Illness.Description')]
 
-## remove empty cells
+#### remove empty cells
 empty_cells <- sum(data_model == "")
 print(empty_cells)
 
 cleaned_data_model <- data_model[rowSums(data_model == "") == 0, ]
-# Define the levels to combine
+### Define the levels to combine
 levels_to_combine <- c("PANCREAS TRANSPLANT", 
                        "ALLOGENEIC BONE MARROW TRANSPLANT",
                        "AUTOLOGOUS BONE MARROW TRANSPLANT OR T-CELL IMMUNOTHERAPY",
@@ -415,7 +415,7 @@ cleaned_data_model_no <- cleaned_data_model[cleaned_data_model$Length.of.Stay<23
 
 
 
-# test with LINEAR
+### test with LINEAR
 library(car)
 lm_model <- lm(Length.of.Stay ~ ., data=cleaned_data_model)
 summary(lm_model)
@@ -425,14 +425,14 @@ summary(lm_model_no)
 
 vif(lm_model)
 
-# Prepare data for modeling
+#### Prepare data for modeling
 
 install.packages("caTools")
 library(caTools)
 # Generate a random number sequence that can be reproduced to verify results.
 set.seed(2004)
 
-# 70% trainset. Stratify on Y = mpg. Caution: Sample size only 32 in this example.
+#### 70% trainset. Stratify on Y = mpg. Caution: Sample size only 32 in this example.
 train <- sample.split(Y = cleaned_data_model$Length.of.Stay, SplitRatio = 0.7)
 trainset <- subset(cleaned_data_model, train == T)
 testset <- subset(cleaned_data_model, train == F)
@@ -443,42 +443,42 @@ testset_no <- subset(cleaned_data_model_no, train_no == F)
 
 
 
-# Checking the distribution of Y is similar in trainset vs testset.
+#### Checking the distribution of Y is similar in trainset vs testset.
 summary(trainset$Length.of.Stay)
 summary(testset$Length.of.Stay)
 
 summary(trainset_no$Length.of.Stay)
 summary(testset_no$Length.of.Stay)
 
-# Develop model on trainset
+#### Develop model on trainset
 lm_prd_model <- lm(Length.of.Stay ~ ., data = trainset)
 summary(lm_prd_model)
 residuals(lm_prd_model) 
 
-# Residuals = Error = Actual mpg - Model Predicted mpg
+#### Residuals = Error = Actual mpg - Model Predicted mpg
 RMSE.lm_prd_model.train <- sqrt(mean(residuals(lm_prd_model)^2))  # RMSE on trainset based on lm_prd_model model.
 summary(abs(residuals(lm_prd_model)))
 
-# Apply model from trainset to predict on testset.
+#### Apply model from trainset to predict on testset.
 predict.lm_prd_model.test <- predict(lm_prd_model, newdata = testset)
 testset.error <- testset$Length.of.Stay - predict.lm_prd_model.test
 
 
-# Develop model on trainset w/o outliers
+#### Develop model on trainset w/o outliers
 lm_prd_model_no <- lm(Length.of.Stay ~ ., data = trainset_no)
 summary(lm_prd_model_no)
 residuals(lm_prd_model_no) 
 
-# Residuals = Error = Actual mpg - Model Predicted mpg
+#### Residuals = Error = Actual mpg - Model Predicted mpg
 RMSE.lm_prd_model_no.train <- sqrt(mean(residuals(lm_prd_model_no)^2))  # RMSE on trainset based on lm_prd_model model.
 summary(abs(residuals(lm_prd_model)))
 
-# Apply model from trainset to predict on testset.
+#### Apply model from trainset to predict on testset.
 predict.lm_prd_model_no.test <- predict(lm_prd_model_no, newdata = testset_no)
 testset_no.error <- testset_no$Length.of.Stay - predict.lm_prd_model_no.test
 
 
-# running cart
+### running cart
 library(rpart)
 library(rpart.plot)
 set.seed(2020) 
@@ -488,16 +488,16 @@ plotcp(los_cart)
 
 CVerror.cap <- los_cart $cptable[which.min(los_cart $cptable[,"xerror"]), "xerror"] + 
   los_cart $cptable[which.min(los_cart $cptable[,"xerror"]), "xstd"]
-# Find the optimal CP region whose CV error is just below CVerror.cap in maximal tree price.cart1.
+#### Find the optimal CP region whose CV error is just below CVerror.cap in maximal tree price.cart1.
 i <- 1; j<- 4
 while (los_cart$cptable[i,j] > CVerror.cap) {
   i <- i + 1
 }
 
-# Get geometric mean of the identified min CP value and the CP above if optimal tree has at least one split.
+#### Get geometric mean of the identified min CP value and the CP above if optimal tree has at least one split.
 cp.opt = ifelse(i > 1, sqrt(los_cart$cptable[i,1] * los_cart$cptable[i-1,1]), 1)
 
-# Get best tree based on 10 fold CV with 1 SE
+#### Get best tree based on 10 fold CV with 1 SE
 los_cart.best <- prune(los_cart, cp = cp.opt)
 
 tail(printcp(los_cart.best))
@@ -505,7 +505,7 @@ tail(printcp(los_cart.best))
 
 rpart.plot(los_cart.best, main = "Pruned Regression Tree", type = 4, extra = 101)
 
-# Make predictions on the test set
+#### Make predictions on the test set
 
 predicted_LOS <- predict(los_cart.best, newdata = testset)
 mse <- mean((testset$Length.of.Stay - predicted_LOS)^2)
@@ -517,7 +517,7 @@ terminal_nodes <- node_numbers[node_numbers == "<leaf>"]
 print(terminal_nodes)
 
 
-##CART w/o outliers
+#### CART w/o outliers
 los_cart_no <- rpart(Length.of.Stay ~ . , data = trainset_no, method = 'anova', cp = 0)
 CVerror.cap <- los_cart_no $cptable[which.min(los_cart_no $cptable[,"xerror"]), "xerror"] + 
   los_cart_no $cptable[which.min(los_cart_no$cptable[,"xerror"]), "xstd"]
@@ -535,7 +535,7 @@ print(paste("Root Mean Squared Error on Test Set:", sqrt(mse)))
 
 
 
-#Random Forest
+### Random Forest
 
 install.packages("randomForest")
 library(randomForest)
@@ -555,7 +555,7 @@ print(paste("Number of trees in the Random Forest:", num_trees))
 
 RSF <- floor(8/3)
 
-##Random Forest w/o outliers
+#### Random Forest w/o outliers
 
 RF_no <- randomForest(Length.of.Stay ~ . , data=trainset_no)
 RF_no.yhat <- predict(RF_no, newdata = testset_no)
